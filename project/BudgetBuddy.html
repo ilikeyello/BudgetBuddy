@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BudgetBuddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: #E2DED8;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+    }
+    #root { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    input::placeholder { color: #B0B0BE; }
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(15px, -20px) scale(1.15); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <!-- Future Services Integrations (Supabase & Plaid) CDN Scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2.43.4/dist/umd/supabase.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Future Integrations (Supabase & Plaid) Client Skeletons -->
+  <script src="services/supabase.js"></script>
+  <script src="services/plaid.js"></script>
+
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="components/data.jsx"></script>
+  <script type="text/babel" src="components/shared.jsx"></script>
+  <script type="text/babel" src="components/chat-page.jsx"></script>
+  <script type="text/babel" src="components/goals-page.jsx"></script>
+  <script type="text/babel" src="components/debts-page.jsx"></script>
+  <script type="text/babel" src="components/settings-page.jsx"></script>
+  <script type="text/babel" src="components/auth-page.jsx"></script>
+  <script type="text/babel" src="components/onboarding-page.jsx"></script>
+  <script type="text/babel" src="components/app.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "headingFont": "Space Grotesk",
+      "accent": "Mint",
+      "chatBubbleStyle": "cards",
+      "animationSpeed": 1
+    }/*EDITMODE-END*/;
+
+    const Root = () => {
+      const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+      return (
+        <React.Fragment>
+          <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <BudgetBuddyApp tweaks={tweaks} />
+          </div>
+          <TweaksPanel title="BudgetBuddy">
+            <TweakSection label="Typography">
+              <TweakSelect label="Heading font" value={tweaks.headingFont}
+                options={['Space Grotesk', 'Outfit', 'Sora']}
+                onChange={v => setTweak('headingFont', v)} />
+            </TweakSection>
+            <TweakSection label="Colors">
+              <TweakColor label="Accent" value={tweaks.accent}
+                options={[
+                  ['#C8E450', '#EEF1C4', '#F8F9E8'],
+                  ['#B5A3DB', '#DDD5F0', '#EEEAF5'],
+                  ['#6DCAA8', '#C0E8D8', '#E5F5EE'],
+                  ['#E8A882', '#F0D4C0', '#F8EDE5']
+                ]}
+                onChange={v => {
+                  const map = { '#C8E450': 'Lime', '#B5A3DB': 'Lavender', '#6DCAA8': 'Mint', '#E8A882': 'Coral' };
+                  const name = Array.isArray(v) ? (map[v[0]] || 'Lime') : 'Lime';
+                  setTweak('accent', name);
+                }} />
+            </TweakSection>
+            <TweakSection label="Chat">
+              <TweakRadio label="Bubble style" value={tweaks.chatBubbleStyle}
+                options={['minimal', 'cards', 'glass']}
+                onChange={v => setTweak('chatBubbleStyle', v)} />
+            </TweakSection>
+          </TweaksPanel>
+        </React.Fragment>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+  </script>
+</body>
+</html>
